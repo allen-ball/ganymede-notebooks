@@ -50,13 +50,14 @@ ifeq ("$(shell uname -s)","Linux")
 export JAVA_HOME?=/usr/lib/jvm/adoptopenjdk-11-hotspot-amd64
 endif
 # ----------------------------------------------------------------------------
+SPARK_VERSION?=3.1.2
+HADOOP_VERSION?=3.2
+SPARK_HOME?=$(DOT_VENV)/spark-$(SPARK_VERSION)-bin-hadoop$(HADOOP_VERSION)
+# ----------------------------------------------------------------------------
 # ipython
 # ----------------------------------------------------------------------------
 #KERNELS+=ipython
 #ENVVARS+=SPARK_HOME
-#SPARK_VERSION?=3.0.2
-#HADOOP_VERSION?=3.2
-#SPARK_HOME?=$(DOT_VENV)/spark-$(SPARK_VERSION)-bin-hadoop$(HADOOP_VERSION)
 #PACKAGES+=ipython 'pyspark==$(SPARK_VERSION)' py4j
 
 kernel-ipython: $(SPARK_HOME)
@@ -71,17 +72,20 @@ kernel-ipython: $(SPARK_HOME)
 # Ganymede
 # ----------------------------------------------------------------------------
 KERNELS+=ganymede
+
 GANYMEDE_RELEASE_VERSION?=1.0.0.20210422
 GANYMEDE_RELEASE_URL?=https://github.com/allen-ball/ganymede/releases/download/v$(GANYMEDE_RELEASE_VERSION)/ganymede-kernel-$(GANYMEDE_RELEASE_VERSION).jar
 GANYMEDE_RELEASE_JAR?=$(DOT_VENV)/ganymede-kernel-$(GANYMEDE_RELEASE_VERSION).jar
+GANYMEDE_RELEASE_SPARK_VERSION?=3.1.1
+GANYMEDE_RELEASE_HADOOP_VERSION?=3.2
+GANYMEDE_RELEASE_SPARK_HOME?=$(DOT_VENV)/spark-$(GANYMEDE_RELEASE_SPARK_VERSION)-bin-hadoop$(GANYMEDE_RELEASE_HADOOP_VERSION)
+
 GANYMEDE_SNAPSHOT_VERSION?=1.1.0-SNAPSHOT
 GANYMEDE_SNAPSHOT_JAR?=$(HOME)/.m2/repository/ganymede/ganymede-kernel/$(GANYMEDE_SNAPSHOT_VERSION)/ganymede-kernel-$(GANYMEDE_SNAPSHOT_VERSION).jar
-SPARK_VERSION?=3.1.1
-HADOOP_VERSION?=3.2
-SPARK_HOME?=$(DOT_VENV)/spark-$(SPARK_VERSION)-bin-hadoop$(HADOOP_VERSION)
+
 PACKAGES+='pyspark==$(SPARK_VERSION)' py4j
 
-kernel-ganymede: $(GANYMEDE_RELEASE_JAR) $(GANYMEDE_SNAPSHOT_JAR) $(SPARK_HOME)
+kernel-ganymede: $(GANYMEDE_RELEASE_JAR) $(GANYMEDE_SNAPSHOT_JAR) $(GANYMEDE_RELEASE_SPARK_HOME) $(SPARK_HOME)
 	$(PIPENV) run \
 		$(shell /usr/libexec/java_home -v 11)/bin/java \
 			-jar $(GANYMEDE_RELEASE_JAR) --install --sys-prefix
@@ -89,9 +93,9 @@ kernel-ganymede: $(GANYMEDE_RELEASE_JAR) $(GANYMEDE_SNAPSHOT_JAR) $(SPARK_HOME)
 		$(shell /usr/libexec/java_home -v 11)/bin/java \
 			-jar $(GANYMEDE_RELEASE_JAR) \
 			--install --sys-prefix \
-			--id-suffix=spark-$(SPARK_VERSION) \
-			--display-name-suffix="with Spark $(SPARK_VERSION)" \
-			--env=SPARK_HOME=$(SPARK_HOME)
+			--id-suffix=spark-$(GANYMEDE_RELEASE_SPARK_VERSION) \
+			--display-name-suffix="with Spark $(GANYMEDE_RELEASE_SPARK_VERSION)" \
+			--env=SPARK_HOME=$(GANYMEDE_RELEASE_SPARK_HOME)
 	$(PIPENV) run \
 		$(shell /usr/libexec/java_home -v 11)/bin/java \
 			-jar $(GANYMEDE_SNAPSHOT_JAR) \
@@ -178,7 +182,7 @@ serverextension-enable-%:
 # -----		--------		-----
 # 2.4.7		     2.7		 2.11
 # 2.4.8		     2.7		 2.12
-# 3.0.2		2.7, 3.2		 2.12
+# 3.0.x		2.7, 3.2		 2.12
 # 3.1.x		2.7, 3.2		 2.12
 # ----------------------------------------------------------------------------
 APACHE_SPARK_MIRROR?=https://mirrors.sonic.net/apache/spark
