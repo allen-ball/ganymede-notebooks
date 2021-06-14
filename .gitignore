@@ -1,7 +1,11 @@
 # .gitignore
 .DS_Store
 .classpath
+.env
 .ipynb_checkpoints/
 .project
 .settings/
 .svn/
+.venv/
+Pipfile
+Pipfile.lock
