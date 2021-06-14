@@ -19,7 +19,7 @@ PIPENV=pipenv --bare
 DOTENV=$(PIPENV) run dotenv -f $(DOT_ENV)
 
 PIPFILE=Pipfile
-DOT_VENV=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))/.venv
+DOT_VENV=$(realpath $(dir $(firstword $(MAKEFILE_LIST))))/.venv
 DOT_ENV=$(dir $(DOT_VENV))/.env
 
 all::	$(DOT_VENV)
