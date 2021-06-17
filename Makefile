@@ -85,43 +85,65 @@ GANYMEDE_SNAPSHOT_JAR?=$(HOME)/.m2/repository/ganymede/ganymede-kernel/$(GANYMED
 
 PACKAGES+='pyspark==$(SPARK_VERSION)' py4j
 
-kernel-ganymede: $(GANYMEDE_RELEASE_JAR) $(GANYMEDE_SNAPSHOT_JAR) $(GANYMEDE_RELEASE_SPARK_HOME) $(SPARK_HOME)
-	$(PIPENV) run \
-		$(shell /usr/libexec/java_home -v 11)/bin/java \
-			-jar $(GANYMEDE_RELEASE_JAR) --install --sys-prefix
-	$(PIPENV) run \
-		$(shell /usr/libexec/java_home -v 11)/bin/java \
-			-jar $(GANYMEDE_RELEASE_JAR) \
-			--install --sys-prefix \
-			--id-suffix=spark-$(GANYMEDE_RELEASE_SPARK_VERSION) \
-			--display-name-suffix="with Spark $(GANYMEDE_RELEASE_SPARK_VERSION)" \
-			--env=SPARK_HOME=$(GANYMEDE_RELEASE_SPARK_HOME)
-	$(PIPENV) run \
-		$(shell /usr/libexec/java_home -v 11)/bin/java \
-			-jar $(GANYMEDE_SNAPSHOT_JAR) \
-			--install --sys-prefix --copy-jar=false
-	$(PIPENV) run \
-		$(shell /usr/libexec/java_home -v 11)/bin/java \
-			-jar $(GANYMEDE_SNAPSHOT_JAR) \
-			--install --sys-prefix --copy-jar=false \
-			--id-suffix=spark-$(SPARK_VERSION) \
-			--display-name-suffix="with Spark $(SPARK_VERSION)" \
-			--env=SPARK_HOME=$(SPARK_HOME)
-	$(PIPENV) run \
-		$(shell /usr/libexec/java_home -v 13)/bin/java \
-			-jar $(GANYMEDE_SNAPSHOT_JAR) \
-			--install --sys-prefix --copy-jar=false
-	$(PIPENV) run \
-		$(shell /usr/libexec/java_home -v 15)/bin/java \
-			-jar $(GANYMEDE_SNAPSHOT_JAR) \
-			--install --sys-prefix --copy-jar=false
-	$(PIPENV) run \
-		$(shell /usr/libexec/java_home -v 16)/bin/java \
-			-jar $(GANYMEDE_SNAPSHOT_JAR) \
-			--install --sys-prefix --copy-jar=false
+kernel-ganymede: $(GANYMEDE_RELEASE_JAR)
+	@$(MAKE) install-ganymede-kernel \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
+		KERNEL_JAR=$(GANYMEDE_RELEASE_JAR) \
+		INSTALL_ARGS="--sys-prefix"
+	@$(MAKE) install-ganymede-kernel-with-spark \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
+		KERNEL_JAR=$(GANYMEDE_RELEASE_JAR) \
+		SPARK_VERSION=$(GANYMEDE_RELEASE_SPARK_VERSION) \
+		SPARK_HOME=$(GANYMEDE_RELEASE_SPARK_HOME) \
+		INSTALL_ARGS="--sys-prefix"
+ifeq ("$(GANYMEDE_SNAPSHOT_JAR)","$(wildcard $(GANYMEDE_SNAPSHOT_JAR))")
+	@$(MAKE) install-ganymede-kernel \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
+		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
+		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+	@$(MAKE) install-ganymede-kernel-with-spark \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
+		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
+		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+	@$(MAKE) install-ganymede-kernel \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 13) \
+		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
+		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+	@$(MAKE) install-ganymede-kernel-with-spark \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 13) \
+		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
+		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+	$(MAKE) install-ganymede-kernel \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 15) \
+		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
+		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+	@$(MAKE) install-ganymede-kernel-with-spark \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 15) \
+		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
+		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+	@$(MAKE) install-ganymede-kernel \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 16) \
+		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
+		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+	@$(MAKE) install-ganymede-kernel-with-spark \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 16) \
+		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
+		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+endif
 
 $(GANYMEDE_RELEASE_JAR):
 	curl -sL $(GANYMEDE_RELEASE_URL) -o $@
+
+install-ganymede-kernel:
+	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) \
+		--install $(INSTALL_ARGS)
+
+install-ganymede-kernel-with-spark: $(SPARK_HOME)
+	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) \
+		--install $(INSTALL_ARGS) \
+		--id-suffix=spark-$(SPARK_VERSION) \
+		--display-name-suffix="with Spark $(SPARK_VERSION)" \
+		--env=SPARK_HOME=$(SPARK_HOME)
 # ----------------------------------------------------------------------------
 NBEXTENSIONS+=widgetsnbextension
 PACKAGES+=ipywidgets
