@@ -38,7 +38,9 @@ PACKAGES+=jupyterlab virtualenv
 PACKAGES+=jupyter_contrib_nbextensions
 PACKAGES+=ipysheet jedi numpy pandas pandoc scipy
 PACKAGES+=cufflinks matplotlib plotly seaborn
-PACKAGES+=nbconvert
+# https://github.com/ipython-contrib/jupyter_contrib_nbextensions/issues/1529
+# https://github.com/jfbercher/jupyter_latex_envs/pull/58
+PACKAGES+='nbconvert<6.0'
 PACKAGES+=nbopen
 # ----------------------------------------------------------------------------
 ENVVARS+=JAVA_HOME
