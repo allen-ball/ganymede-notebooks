@@ -68,7 +68,7 @@ kernel-ipython: $(SPARK_HOME)
 # .venv/share/jupyter/kernels/python3
 # $(JUPYTER) kernelspec list --json | jq '.kernelspecs.python3.spec' | cat
 #  "env": {
-#    "SPARK_HOME": "/Users/ball/Notebooks/.venv/spark-3.0.2-bin-hadoop3.2"
+#    "SPARK_HOME": "/Users/ball/Notebooks/.venv/spark-3.0.3-bin-hadoop3.2"
 #  }
 # ----------------------------------------------------------------------------
 # Ganymede
