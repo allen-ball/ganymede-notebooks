@@ -55,6 +55,9 @@ endif
 SPARK_VERSION?=3.1.2
 HADOOP_VERSION?=3.2
 SPARK_HOME?=$(DOT_VENV)/spark-$(SPARK_VERSION)-bin-hadoop$(HADOOP_VERSION)
+
+HIVE_VERSION?=3.1.2
+HIVE_HOME?=$(DOT_VENV)/apache-hive-$(HIVE_VERSION)-bin
 # ----------------------------------------------------------------------------
 # ipython
 # ----------------------------------------------------------------------------
@@ -140,12 +143,12 @@ install-ganymede:
 	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) \
 		--install $(INSTALL_ARGS)
 
-install-ganymede-with-spark: $(SPARK_HOME)
+install-ganymede-with-spark: $(SPARK_HOME) $(HIVE_HOME)
 	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) \
 		--install $(INSTALL_ARGS) \
 		--id-suffix=spark-$(SPARK_VERSION) \
 		--display-name-suffix="with Spark $(SPARK_VERSION)" \
-		--env=SPARK_HOME=$(SPARK_HOME)
+		--env=SPARK_HOME=$(SPARK_HOME) --env=HIVE_HOME=$(HIVE_HOME)
 # ----------------------------------------------------------------------------
 NBEXTENSIONS+=widgetsnbextension
 PACKAGES+=ipywidgets
@@ -209,7 +212,8 @@ serverextension-enable-%:
 # 3.0.x		2.7, 3.2		 2.12
 # 3.1.x		2.7, 3.2		 2.12
 # ----------------------------------------------------------------------------
-APACHE_SPARK_MIRROR?=https://mirrors.sonic.net/apache/spark
+APACHE_MIRROR?=https://mirrors.sonic.net/apache
+APACHE_SPARK_MIRROR?=$(APACHE_MIRROR)/spark
 
 $(DOT_VENV)/spark-%-bin-hadoop2.7: $(DOT_VENV)
 	curl -sL $(APACHE_SPARK_MIRROR)/$(subst -bin-hadoop2.7,,$(notdir $@))/$(notdir $@).tgz \
@@ -217,4 +221,12 @@ $(DOT_VENV)/spark-%-bin-hadoop2.7: $(DOT_VENV)
 
 $(DOT_VENV)/spark-%-bin-hadoop3.2: $(DOT_VENV)
 	curl -sL $(APACHE_SPARK_MIRROR)/$(subst -bin-hadoop3.2,,$(notdir $@))/$(notdir $@).tgz \
+		| tar xzCf $(DOT_VENV) -
+# ----------------------------------------------------------------------------
+# Apache Hive
+# ----------------------------------------------------------------------------
+APACHE_HIVE_MIRROR?=$(APACHE_MIRROR)/hive
+
+$(DOT_VENV)/apache-hive-%-bin: $(DOT_VENV)
+	curl -sL $(APACHE_HIVE_MIRROR)/$(subst apache-,,$(subst -bin,,$(notdir $@)))/$(notdir $@).tar.gz \
 		| tar xzCf $(DOT_VENV) -
