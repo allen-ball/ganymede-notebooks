@@ -4,6 +4,9 @@
 export LANG=en_US.UTF-8
 export LC_ALL=$(LANG)
 
+export PYTHON?=$(shell which python)
+
+export PIPENV_IGNORED_INSTALLED=1
 export PIPENV_VENV_IN_PROJECT=1
 export PIPENV_YES=1
 
@@ -15,7 +18,7 @@ export HOMEBREW_NO_COLOR=1
 export HOMEBREW_NO_EMOJI=1
 endif
 
-PIPENV=pipenv --bare
+PIPENV=pipenv --bare --python=$(PYTHON)
 DOTENV=$(PIPENV) run dotenv -f $(DOT_ENV)
 
 PIPFILE=Pipfile
@@ -28,23 +31,16 @@ ENVVARS=
 # ----------------------------------------------------------------------------
 # JupyterLab
 # ----------------------------------------------------------------------------
-KERNELS=
-NBEXTENSIONS=
-SERVEREXTENSIONS=
+KERNELS+=
+NBEXTENSIONS+=
+SERVEREXTENSIONS+=
 
 JUPYTER=$(PIPENV) run jupyter
 
 PACKAGES+=jupyterlab virtualenv
 PACKAGES+=jupyter_contrib_nbextensions
-PACKAGES+=ipysheet jedi numpy pandas pandoc scipy
-PACKAGES+=cufflinks matplotlib plotly seaborn
-# https://github.com/ipython-contrib/jupyter_contrib_nbextensions/issues/1529
-# https://github.com/jfbercher/jupyter_latex_envs/pull/58
-PACKAGES+='nbconvert<6.0'
-PACKAGES+=nbopen
 # ----------------------------------------------------------------------------
 ENVVARS+=JAVA_HOME
-PACKAGES+=jep
 ifeq ("$(shell uname -s)","Darwin")
 export JAVA_HOME?=$(shell /usr/libexec/java_home -v 11)
 endif
@@ -59,21 +55,6 @@ SPARK_HOME?=$(DOT_VENV)/spark-$(SPARK_VERSION)-bin-hadoop$(HADOOP_VERSION)
 HIVE_VERSION?=3.1.2
 HIVE_HOME?=$(DOT_VENV)/apache-hive-$(HIVE_VERSION)-bin
 # ----------------------------------------------------------------------------
-# ipython
-# ----------------------------------------------------------------------------
-#KERNELS+=ipython
-#ENVVARS+=SPARK_HOME
-#PACKAGES+=ipython 'pyspark==$(SPARK_VERSION)' py4j
-
-kernel-ipython: $(SPARK_HOME)
-	$(PIPENV) run ipython kernel install-self
-# https://stackoverflow.com/questions/42716734/modify-a-key-value-in-a-json-using-jq-in-place
-# .venv/share/jupyter/kernels/python3
-# $(JUPYTER) kernelspec list --json | jq '.kernelspecs.python3.spec' | cat
-#  "env": {
-#    "SPARK_HOME": "/Users/ball/Notebooks/.venv/spark-3.0.3-bin-hadoop3.2"
-#  }
-# ----------------------------------------------------------------------------
 # Ganymede
 # ----------------------------------------------------------------------------
 KERNELS+=ganymede
@@ -87,53 +68,72 @@ GANYMEDE_RELEASE_SPARK_HOME?=$(DOT_VENV)/spark-$(GANYMEDE_RELEASE_SPARK_VERSION)
 
 GANYMEDE_SNAPSHOT_VERSION?=2.0.0-SNAPSHOT
 GANYMEDE_SNAPSHOT_JAR?=$(HOME)/.m2/repository/ganymede/ganymede/$(GANYMEDE_SNAPSHOT_VERSION)/ganymede-$(GANYMEDE_SNAPSHOT_VERSION).jar
-
-PACKAGES+='pyspark==$(SPARK_VERSION)' py4j
+GANYMEDE_SNAPSHOT_SPARK_VERSION?=3.1.2
+GANYMEDE_SNAPSHOT_HADOOP_VERSION?=3.2
+GANYMEDE_SNAPSHOT_SPARK_HOME?=$(DOT_VENV)/spark-$(GANYMEDE_SNAPSHOT_SPARK_VERSION)-bin-hadoop$(GANYMEDE_SNAPSHOT_HADOOP_VERSION)
 
 kernel-ganymede: $(GANYMEDE_RELEASE_JAR)
 	@$(MAKE) install-ganymede \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
 		KERNEL_JAR=$(GANYMEDE_RELEASE_JAR) \
-		INSTALL_ARGS="--sys-prefix"
+		INSTALL_ARGS="--install --sys-prefix"
 	@$(MAKE) install-ganymede-with-spark \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
 		KERNEL_JAR=$(GANYMEDE_RELEASE_JAR) \
 		SPARK_VERSION=$(GANYMEDE_RELEASE_SPARK_VERSION) \
 		SPARK_HOME=$(GANYMEDE_RELEASE_SPARK_HOME) \
-		INSTALL_ARGS="--sys-prefix"
+		INSTALL_ARGS="--install --sys-prefix"
 ifeq ("$(GANYMEDE_SNAPSHOT_JAR)","$(wildcard $(GANYMEDE_SNAPSHOT_JAR))")
 	@$(MAKE) install-ganymede \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
 		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
 	@$(MAKE) install-ganymede-with-spark \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
 		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+		SPARK_VERSION=$(GANYMEDE_SNAPSHOT_SPARK_VERSION) \
+		SPARK_HOME=$(GANYMEDE_SNAPSHOT_SPARK_HOME) \
+		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
 	@$(MAKE) install-ganymede \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 13) \
 		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
 	@$(MAKE) install-ganymede-with-spark \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 13) \
 		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+		SPARK_VERSION=$(GANYMEDE_SNAPSHOT_SPARK_VERSION) \
+		SPARK_HOME=$(GANYMEDE_SNAPSHOT_SPARK_HOME) \
+		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
 	$(MAKE) install-ganymede \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 15) \
 		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
 	@$(MAKE) install-ganymede-with-spark \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 15) \
 		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+		SPARK_VERSION=$(GANYMEDE_SNAPSHOT_SPARK_VERSION) \
+		SPARK_HOME=$(GANYMEDE_SNAPSHOT_SPARK_HOME) \
+		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
 	@$(MAKE) install-ganymede \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 16) \
 		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
 	@$(MAKE) install-ganymede-with-spark \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 16) \
 		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		INSTALL_ARGS="--sys-prefix --copy-jar=false"
+		SPARK_VERSION=$(GANYMEDE_SNAPSHOT_SPARK_VERSION) \
+		SPARK_HOME=$(GANYMEDE_SNAPSHOT_SPARK_HOME) \
+		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
+	@$(MAKE) install-ganymede \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 17) \
+		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
+		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
+	@$(MAKE) install-ganymede-with-spark \
+		JAVA_HOME=$(shell /usr/libexec/java_home -v 17) \
+		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
+		SPARK_VERSION=$(GANYMEDE_SNAPSHOT_SPARK_VERSION) \
+		SPARK_HOME=$(GANYMEDE_SNAPSHOT_SPARK_HOME) \
+		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
 endif
 
 $(GANYMEDE_RELEASE_JAR):
@@ -141,27 +141,22 @@ $(GANYMEDE_RELEASE_JAR):
 
 install-ganymede:
 	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) \
-		--install $(INSTALL_ARGS)
+		$(INSTALL_ARGS)
 
 install-ganymede-with-spark: $(SPARK_HOME) $(HIVE_HOME)
 	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) \
-		--install $(INSTALL_ARGS) \
+		$(INSTALL_ARGS) \
 		--id-suffix=spark-$(SPARK_VERSION) \
 		--display-name-suffix="with Spark $(SPARK_VERSION)" \
 		--env=SPARK_HOME=$(SPARK_HOME) --env=HIVE_HOME=$(HIVE_HOME)
-# ----------------------------------------------------------------------------
-NBEXTENSIONS+=widgetsnbextension
-PACKAGES+=ipywidgets
-# ----------------------------------------------------------------------------
-SERVEREXTENSIONS+=jupyter_spark
-NBEXTENSIONS+=jupyter_spark
-# ----------------------------------------------------------------------------
+
 $(PIPFILE) $(DOT_VENV):
 	@$(MAKE) $(DOT_ENV)
 	$(PIPENV) run pip install $(PACKAGES) $(NBEXTENSIONS)
 	@$(MAKE) kernels
 	$(JUPYTER) contrib nbextension install --sys-prefix
 	@$(MAKE) nbextensions
+	$(JUPYTER) serverextension enable jupyterlab --py --sys-prefix
 	@$(MAKE) serverextensions
 	$(JUPYTER) labextension install @jupyter-widgets/jupyterlab-manager
 	$(JUPYTER) labextension list
@@ -211,6 +206,7 @@ serverextension-enable-%:
 # 2.4.8		     2.7		 2.12
 # 3.0.x		2.7, 3.2		 2.12
 # 3.1.x		2.7, 3.2		 2.12
+# 3.2.x		2.7, 3.3 (3.2)		 2.12, 2.13
 # ----------------------------------------------------------------------------
 APACHE_MIRROR?=https://mirrors.sonic.net/apache
 APACHE_SPARK_MIRROR?=$(APACHE_MIRROR)/spark
