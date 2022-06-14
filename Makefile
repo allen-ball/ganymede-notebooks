@@ -38,11 +38,11 @@ SERVEREXTENSIONS+=
 JUPYTER=$(PIPENV) run jupyter
 
 PACKAGES+=jupyterlab virtualenv
-PACKAGES+=jupyter_contrib_nbextensions
-
 # https://github.com/ipython-contrib/jupyter_contrib_nbextensions/issues/1529
 # https://github.com/jfbercher/jupyter_latex_envs/pull/58
-#PACKAGES+='nbconvert<6.0'
+PACKAGES+=git+https://github.com/ipython-contrib/jupyter_contrib_nbextensions.git
+PACKAGES+=git+https://github.com/jfbercher/jupyter_latex_envs.git
+PACKAGES+=nbconvert
 # ----------------------------------------------------------------------------
 ENVVARS+=JAVA_HOME
 ifeq ("$(shell uname -s)","Darwin")
