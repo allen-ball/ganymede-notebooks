@@ -204,13 +204,14 @@ serverextension-enable-%:
 # ----------------------------------------------------------------------------
 # Apache Spark
 #
-# Spark		Hadoop			Scala
-# -----		--------		-----
-# 2.4.7		     2.7		 2.11
-# 2.4.8		     2.7		 2.12
-# 3.0.x		2.7, 3.2		 2.12
-# 3.1.x		2.7, 3.2		 2.12
-# 3.2.x		2.7, 3.3 (3.2)		 2.12, 2.13
+# Spark         Hadoop                  Scala
+# -----         --------                -----
+# 2.4.7              2.7                 2.11
+# 2.4.8              2.7                 2.12
+# 3.0.x         2.7, 3.2                 2.12
+# 3.1.x         2.7, 3.2                 2.12
+# 3.2.x         2.7, 3.3 (3.2)           2.12, 2.13
+# 3.3.x         2.7, 3.3                 2.12, 2.13
 # ----------------------------------------------------------------------------
 APACHE_MIRROR?=https://mirrors.sonic.net/apache
 APACHE_SPARK_MIRROR?=$(APACHE_MIRROR)/spark
@@ -219,8 +220,16 @@ $(DOT_VENV)/spark-%-bin-hadoop2.7: $(DOT_VENV)
 	curl -sL $(APACHE_SPARK_MIRROR)/$(subst -bin-hadoop2.7,,$(notdir $@))/$(notdir $@).tgz \
 		| tar xzCf $(DOT_VENV) -
 
+$(DOT_VENV)/spark-%-bin-hadoop3: $(DOT_VENV)
+	curl -sL $(APACHE_SPARK_MIRROR)/$(subst -bin-hadoop3,,$(notdir $@))/$(notdir $@).tgz \
+		| tar xzCf $(DOT_VENV) -
+
 $(DOT_VENV)/spark-%-bin-hadoop3.2: $(DOT_VENV)
 	curl -sL $(APACHE_SPARK_MIRROR)/$(subst -bin-hadoop3.2,,$(notdir $@))/$(notdir $@).tgz \
+		| tar xzCf $(DOT_VENV) -
+
+$(DOT_VENV)/spark-%-bin-hadoop3-scala2.13: $(DOT_VENV)
+	curl -sL $(APACHE_SPARK_MIRROR)/$(subst -bin-hadoop3-scala2.13,,$(notdir $@))/$(notdir $@).tgz \
 		| tar xzCf $(DOT_VENV) -
 # ----------------------------------------------------------------------------
 # Apache Hive
