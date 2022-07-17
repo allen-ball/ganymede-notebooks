@@ -63,14 +63,14 @@ HIVE_HOME?=$(DOT_VENV)/apache-hive-$(HIVE_VERSION)-bin
 # ----------------------------------------------------------------------------
 KERNELS+=ganymede
 
-GANYMEDE_RELEASE_VERSION?=1.1.0.20210614
-GANYMEDE_RELEASE_URL?=https://github.com/allen-ball/ganymede/releases/download/v$(GANYMEDE_RELEASE_VERSION)/ganymede-kernel-$(GANYMEDE_RELEASE_VERSION).jar
-GANYMEDE_RELEASE_JAR?=$(DOT_VENV)/ganymede-kernel-$(GANYMEDE_RELEASE_VERSION).jar
+GANYMEDE_RELEASE_VERSION?=2.0.0.20220717
+GANYMEDE_RELEASE_URL?=https://github.com/allen-ball/ganymede/releases/download/v$(GANYMEDE_RELEASE_VERSION)/ganymede-$(GANYMEDE_RELEASE_VERSION).jar
+GANYMEDE_RELEASE_JAR?=$(DOT_VENV)/ganymede-$(GANYMEDE_RELEASE_VERSION).jar
 GANYMEDE_RELEASE_SPARK_VERSION?=$(SPARK_VERSION)
 GANYMEDE_RELEASE_HADOOP_VERSION?=3.2
 GANYMEDE_RELEASE_SPARK_HOME?=$(DOT_VENV)/spark-$(GANYMEDE_RELEASE_SPARK_VERSION)-bin-hadoop$(GANYMEDE_RELEASE_HADOOP_VERSION)
 
-GANYMEDE_SNAPSHOT_VERSION?=2.0.0-SNAPSHOT
+GANYMEDE_SNAPSHOT_VERSION?=2.1.0-SNAPSHOT
 GANYMEDE_SNAPSHOT_JAR?=$(HOME)/.m2/repository/ganymede/ganymede/$(GANYMEDE_SNAPSHOT_VERSION)/ganymede-$(GANYMEDE_SNAPSHOT_VERSION).jar
 GANYMEDE_SNAPSHOT_SPARK_VERSION?=$(SPARK_VERSION)
 GANYMEDE_SNAPSHOT_HADOOP_VERSION?=3.2
@@ -80,13 +80,13 @@ kernel-ganymede: $(GANYMEDE_RELEASE_JAR)
 	@$(MAKE) install-ganymede \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
 		KERNEL_JAR=$(GANYMEDE_RELEASE_JAR) \
-		INSTALL_ARGS="--install --sys-prefix"
+		INSTALL_ARGS="-i --sys-prefix"
 	@$(MAKE) install-ganymede-with-spark \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
 		KERNEL_JAR=$(GANYMEDE_RELEASE_JAR) \
 		SPARK_VERSION=$(GANYMEDE_RELEASE_SPARK_VERSION) \
 		SPARK_HOME=$(GANYMEDE_RELEASE_SPARK_HOME) \
-		INSTALL_ARGS="--install --sys-prefix"
+		INSTALL_ARGS="-i --sys-prefix"
 ifeq ("$(GANYMEDE_SNAPSHOT_JAR)","$(wildcard $(GANYMEDE_SNAPSHOT_JAR))")
 	@$(MAKE) install-ganymede \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
@@ -144,8 +144,7 @@ $(GANYMEDE_RELEASE_JAR):
 	curl -sL $(GANYMEDE_RELEASE_URL) -o $@
 
 install-ganymede:
-	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) \
-		$(INSTALL_ARGS)
+	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) $(INSTALL_ARGS)
 
 install-ganymede-with-spark: $(SPARK_HOME) $(HIVE_HOME)
 	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) \
