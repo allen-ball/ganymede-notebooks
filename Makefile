@@ -11,11 +11,10 @@ export PIPENV_VENV_IN_PROJECT=1
 export PIPENV_YES=1
 
 ifeq ("$(shell echo $$TERM)","dumb")
-export PIPENV_COLORBLIND=1
+export NO_COLOR=1
+
 export PIPENV_HIDE_EMOJIS=1
 export PIPENV_NOSPIN=1
-export HOMEBREW_NO_COLOR=1
-export HOMEBREW_NO_EMOJI=1
 endif
 
 PIPENV=pipenv --bare --python=$(PYTHON)
@@ -56,7 +55,7 @@ SPARK_VERSION?=3.1.3
 HADOOP_VERSION?=3.2
 SPARK_HOME?=$(DOT_VENV)/spark-$(SPARK_VERSION)-bin-hadoop$(HADOOP_VERSION)
 
-HIVE_VERSION?=$(SPARK_VERSION)
+HIVE_VERSION?=2.3.9
 HIVE_HOME?=$(DOT_VENV)/apache-hive-$(HIVE_VERSION)-bin
 # ----------------------------------------------------------------------------
 # Ganymede
