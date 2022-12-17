@@ -62,7 +62,7 @@ HIVE_HOME?=$(DOT_VENV)/apache-hive-$(HIVE_VERSION)-bin
 # ----------------------------------------------------------------------------
 KERNELS+=ganymede
 
-GANYMEDE_RELEASE_VERSION?=2.0.2.20221025
+GANYMEDE_RELEASE_VERSION?=2.0.3.20221217
 GANYMEDE_RELEASE_URL?=https://github.com/allen-ball/ganymede/releases/download/v$(GANYMEDE_RELEASE_VERSION)/ganymede-$(GANYMEDE_RELEASE_VERSION).jar
 GANYMEDE_RELEASE_JAR?=$(DOT_VENV)/ganymede-$(GANYMEDE_RELEASE_VERSION).jar
 GANYMEDE_RELEASE_SPARK_VERSION?=$(SPARK_VERSION)
@@ -93,36 +93,6 @@ ifeq ("$(GANYMEDE_SNAPSHOT_JAR)","$(wildcard $(GANYMEDE_SNAPSHOT_JAR))")
 		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
 	@$(MAKE) install-ganymede-with-spark \
 		JAVA_HOME=$(shell /usr/libexec/java_home -v 11) \
-		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		SPARK_VERSION=$(GANYMEDE_SNAPSHOT_SPARK_VERSION) \
-		SPARK_HOME=$(GANYMEDE_SNAPSHOT_SPARK_HOME) \
-		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
-	@$(MAKE) install-ganymede \
-		JAVA_HOME=$(shell /usr/libexec/java_home -v 13) \
-		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
-	@$(MAKE) install-ganymede-with-spark \
-		JAVA_HOME=$(shell /usr/libexec/java_home -v 13) \
-		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		SPARK_VERSION=$(GANYMEDE_SNAPSHOT_SPARK_VERSION) \
-		SPARK_HOME=$(GANYMEDE_SNAPSHOT_SPARK_HOME) \
-		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
-	$(MAKE) install-ganymede \
-		JAVA_HOME=$(shell /usr/libexec/java_home -v 15) \
-		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
-	@$(MAKE) install-ganymede-with-spark \
-		JAVA_HOME=$(shell /usr/libexec/java_home -v 15) \
-		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		SPARK_VERSION=$(GANYMEDE_SNAPSHOT_SPARK_VERSION) \
-		SPARK_HOME=$(GANYMEDE_SNAPSHOT_SPARK_HOME) \
-		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
-	@$(MAKE) install-ganymede \
-		JAVA_HOME=$(shell /usr/libexec/java_home -v 16) \
-		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
-		INSTALL_ARGS="-i --sys-prefix --copy-jar=false"
-	@$(MAKE) install-ganymede-with-spark \
-		JAVA_HOME=$(shell /usr/libexec/java_home -v 16) \
 		KERNEL_JAR=$(GANYMEDE_SNAPSHOT_JAR) \
 		SPARK_VERSION=$(GANYMEDE_SNAPSHOT_SPARK_VERSION) \
 		SPARK_HOME=$(GANYMEDE_SNAPSHOT_SPARK_HOME) \
