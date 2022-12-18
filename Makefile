@@ -51,28 +51,25 @@ ifeq ("$(shell uname -s)","Linux")
 export JAVA_HOME?=/usr/lib/jvm/adoptopenjdk-11-hotspot-amd64
 endif
 # ----------------------------------------------------------------------------
-SPARK_VERSION?=3.1.3
-HADOOP_VERSION?=3.2
+SPARK_VERSION?=3.3.1
+HADOOP_VERSION?=3
 SPARK_HOME?=$(DOT_VENV)/spark-$(SPARK_VERSION)-bin-hadoop$(HADOOP_VERSION)
-
-HIVE_VERSION?=2.3.9
-HIVE_HOME?=$(DOT_VENV)/apache-hive-$(HIVE_VERSION)-bin
 # ----------------------------------------------------------------------------
 # Ganymede
 # ----------------------------------------------------------------------------
 KERNELS+=ganymede
 
-GANYMEDE_RELEASE_VERSION?=2.0.3.20221217
+GANYMEDE_RELEASE_VERSION?=2.1.0.20221217
 GANYMEDE_RELEASE_URL?=https://github.com/allen-ball/ganymede/releases/download/v$(GANYMEDE_RELEASE_VERSION)/ganymede-$(GANYMEDE_RELEASE_VERSION).jar
 GANYMEDE_RELEASE_JAR?=$(DOT_VENV)/ganymede-$(GANYMEDE_RELEASE_VERSION).jar
 GANYMEDE_RELEASE_SPARK_VERSION?=$(SPARK_VERSION)
-GANYMEDE_RELEASE_HADOOP_VERSION?=3.2
+GANYMEDE_RELEASE_HADOOP_VERSION?=$(HADOOP_VERSION)
 GANYMEDE_RELEASE_SPARK_HOME?=$(DOT_VENV)/spark-$(GANYMEDE_RELEASE_SPARK_VERSION)-bin-hadoop$(GANYMEDE_RELEASE_HADOOP_VERSION)
 
-GANYMEDE_SNAPSHOT_VERSION?=2.1.0-SNAPSHOT
+GANYMEDE_SNAPSHOT_VERSION?=2.2.0-SNAPSHOT
 GANYMEDE_SNAPSHOT_JAR?=$(HOME)/.m2/repository/dev/hcf/ganymede/ganymede/$(GANYMEDE_SNAPSHOT_VERSION)/ganymede-$(GANYMEDE_SNAPSHOT_VERSION).jar
 GANYMEDE_SNAPSHOT_SPARK_VERSION?=$(SPARK_VERSION)
-GANYMEDE_SNAPSHOT_HADOOP_VERSION?=3.2
+GANYMEDE_SNAPSHOT_HADOOP_VERSION?=$(HADOOP_VERSION)
 GANYMEDE_SNAPSHOT_SPARK_HOME?=$(DOT_VENV)/spark-$(GANYMEDE_SNAPSHOT_SPARK_VERSION)-bin-hadoop$(GANYMEDE_SNAPSHOT_HADOOP_VERSION)
 
 kernel-ganymede: $(GANYMEDE_RELEASE_JAR)
@@ -115,12 +112,12 @@ $(GANYMEDE_RELEASE_JAR):
 install-ganymede:
 	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) $(INSTALL_ARGS)
 
-install-ganymede-with-spark: $(SPARK_HOME) $(HIVE_HOME)
+install-ganymede-with-spark: $(SPARK_HOME)
 	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) \
 		$(INSTALL_ARGS) \
 		--id-suffix=spark-$(SPARK_VERSION) \
 		--display-name-suffix="with Spark $(SPARK_VERSION)" \
-		--env=SPARK_HOME=$(SPARK_HOME) --env=HIVE_HOME=$(HIVE_HOME)
+		--env=SPARK_HOME=$(SPARK_HOME)
 
 $(PIPFILE) $(DOT_VENV):
 	@$(MAKE) $(DOT_ENV)
