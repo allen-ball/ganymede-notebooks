@@ -59,7 +59,7 @@ SPARK_HOME?=$(DOT_VENV)/spark-$(SPARK_VERSION)-bin-hadoop$(HADOOP_VERSION)
 # ----------------------------------------------------------------------------
 KERNELS+=ganymede
 
-GANYMEDE_RELEASE_VERSION?=2.1.0.20221217
+GANYMEDE_RELEASE_VERSION?=2.1.1.20221231
 GANYMEDE_RELEASE_URL?=https://github.com/allen-ball/ganymede/releases/download/v$(GANYMEDE_RELEASE_VERSION)/ganymede-$(GANYMEDE_RELEASE_VERSION).jar
 GANYMEDE_RELEASE_JAR?=$(DOT_VENV)/ganymede-$(GANYMEDE_RELEASE_VERSION).jar
 GANYMEDE_RELEASE_SPARK_VERSION?=$(SPARK_VERSION)
