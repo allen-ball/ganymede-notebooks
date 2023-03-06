@@ -36,10 +36,10 @@ SERVEREXTENSIONS+=
 
 JUPYTER=$(PIPENV) run jupyter
 
-PACKAGES+=jupyterlab virtualenv
+PACKAGES+=jupyterlab virtualenv # jupyter-server<2.0.0
 # https://github.com/ipython-contrib/jupyter_contrib_nbextensions/issues/1529
-# https://github.com/jfbercher/jupyter_latex_envs/pull/58
 PACKAGES+=git+https://github.com/ipython-contrib/jupyter_contrib_nbextensions.git
+# https://github.com/jfbercher/jupyter_latex_envs/pull/58
 PACKAGES+=git+https://github.com/jfbercher/jupyter_latex_envs.git
 PACKAGES+=nbconvert
 # ----------------------------------------------------------------------------
@@ -51,9 +51,11 @@ ifeq ("$(shell uname -s)","Linux")
 export JAVA_HOME?=/usr/lib/jvm/adoptopenjdk-11-hotspot-amd64
 endif
 # ----------------------------------------------------------------------------
-SPARK_VERSION?=3.3.1
+SPARK_VERSION?=3.3.2
 HADOOP_VERSION?=3
+HIVE_VERSION=2.3.9
 SPARK_HOME?=$(DOT_VENV)/spark-$(SPARK_VERSION)-bin-hadoop$(HADOOP_VERSION)
+HIVE_HOME?=$(DOT_VENV)/apache-hive-$(HIVE_VERSION)-bin
 # ----------------------------------------------------------------------------
 # Ganymede
 # ----------------------------------------------------------------------------
@@ -112,12 +114,12 @@ $(GANYMEDE_RELEASE_JAR):
 install-ganymede:
 	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) $(INSTALL_ARGS)
 
-install-ganymede-with-spark: $(SPARK_HOME)
+install-ganymede-with-spark: $(SPARK_HOME) # $(HIVE_HOME)
 	$(PIPENV) run $(JAVA_HOME)/bin/java -jar $(KERNEL_JAR) \
 		$(INSTALL_ARGS) \
 		--id-suffix=spark-$(SPARK_VERSION) \
 		--display-name-suffix="with Spark $(SPARK_VERSION)" \
-		--env=SPARK_HOME=$(SPARK_HOME)
+		--env=SPARK_HOME=$(SPARK_HOME) # --env=HIVE_HOME=$(HIVE_HOME)
 
 $(PIPFILE) $(DOT_VENV):
 	@$(MAKE) $(DOT_ENV)
