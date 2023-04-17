@@ -37,8 +37,7 @@ SERVEREXTENSIONS+=
 JUPYTER=$(PIPENV) run jupyter
 
 PACKAGES+=jupyterlab virtualenv # jupyter-server<2.0.0
-# https://github.com/ipython-contrib/jupyter_contrib_nbextensions/issues/1529
-PACKAGES+=git+https://github.com/ipython-contrib/jupyter_contrib_nbextensions.git
+PACKAGES+=jupyter_contrib_nbextensions
 # https://github.com/jfbercher/jupyter_latex_envs/pull/58
 PACKAGES+=git+https://github.com/jfbercher/jupyter_latex_envs.git
 PACKAGES+=nbconvert
