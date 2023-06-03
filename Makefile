@@ -128,8 +128,6 @@ $(PIPFILE) $(DOT_VENV):
 	@$(MAKE) nbextensions
 	$(JUPYTER) serverextension enable jupyterlab --py --sys-prefix
 	@$(MAKE) serverextensions
-	$(JUPYTER) labextension install @jupyter-widgets/jupyterlab-manager
-	$(JUPYTER) labextension list
 
 clean::
 	@-$(PIPENV) --rm
