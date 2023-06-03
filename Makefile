@@ -4,7 +4,7 @@
 export LANG=en_US.UTF-8
 export LC_ALL=$(LANG)
 
-export PYTHON?=$(shell which python)
+export PYTHON?=$(shell which python3)
 
 export PIPENV_IGNORED_INSTALLED=1
 export PIPENV_VENV_IN_PROJECT=1
