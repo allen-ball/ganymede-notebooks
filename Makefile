@@ -122,6 +122,7 @@ install-ganymede-with-spark: $(SPARK_HOME) # $(HIVE_HOME)
 
 $(PIPFILE) $(DOT_VENV):
 	@$(MAKE) $(DOT_ENV)
+	curl -sS https://bootstrap.pypa.io/get-pip.py | $(PIPENV) run python
 	$(PIPENV) run pip install $(PACKAGES) $(NBEXTENSIONS)
 	@$(MAKE) kernels
 	$(JUPYTER) contrib nbextension install --sys-prefix
