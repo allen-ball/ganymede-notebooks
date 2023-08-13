@@ -31,16 +31,8 @@ ENVVARS=
 # JupyterLab
 # ----------------------------------------------------------------------------
 KERNELS+=
-NBEXTENSIONS+=
-SERVEREXTENSIONS+=
 
 JUPYTER=$(PIPENV) run jupyter
-
-PACKAGES+=jupyterlab virtualenv # jupyter-server<2.0.0
-PACKAGES+=jupyter_contrib_nbextensions
-# https://github.com/jfbercher/jupyter_latex_envs/pull/58
-PACKAGES+=git+https://github.com/jfbercher/jupyter_latex_envs.git
-PACKAGES+=nbconvert
 # ----------------------------------------------------------------------------
 ENVVARS+=JAVA_HOME
 ifeq ("$(shell uname -s)","Darwin")
@@ -120,52 +112,30 @@ install-ganymede-with-spark: $(SPARK_HOME) # $(HIVE_HOME)
 		--display-name-suffix="with Spark $(SPARK_VERSION)" \
 		--env=SPARK_HOME=$(SPARK_HOME) # --env=HIVE_HOME=$(HIVE_HOME)
 
-$(PIPFILE) $(DOT_VENV):
-	@$(MAKE) $(DOT_ENV)
-	curl -sS https://bootstrap.pypa.io/get-pip.py | $(PIPENV) run python
-	$(PIPENV) run pip install $(PACKAGES) $(NBEXTENSIONS)
+$(DOT_ENV) $(DOT_VENV):
+	$(PIPENV) install
+	@touch $(DOT_ENV)
+	@$(MAKE) envvars
 	@$(MAKE) kernels
 	$(JUPYTER) contrib nbextension install --sys-prefix
-	@$(MAKE) nbextensions
-	$(JUPYTER) serverextension enable jupyterlab --py --sys-prefix
-	@$(MAKE) serverextensions
+	$(JUPYTER) nbextension enable hide_input/main --sys-prefix
 
 clean::
 	@-$(PIPENV) --rm
-	@-rm -rf $(PIPFILE) $(PIPFILE).lock
+	@-rm -rf $(DOT_ENV)
+	@-rm -rf $(PIPFILE).lock
 	@-rm -rf .ipynb_checkpoints
-
-$(DOT_ENV):
-	$(PIPENV) install python-dotenv[cli]
-	@touch $(DOT_ENV)
-	@$(MAKE) envvars
 
 envvars: $(addprefix setenv-, $(ENVVARS))
 
 setenv-%:
 	@-$(DOTENV) $(if $(value $*),set $* $($*),unset $*)
 
-clean::
-	@-rm -rf $(DOT_ENV)
-
 kernels: $(addprefix kernel-, $(KERNELS))
 	$(JUPYTER) kernelspec list
 
 kernel-%:
 	@$(MAKE) $@
-
-nbextensions: $(addprefix nbextension-enable-, $(NBEXTENSIONS))
-	$(JUPYTER) nbextension enable hide_input/main --sys-prefix
-	$(JUPYTER) nbextension list
-
-nbextension-enable-%:
-	$(JUPYTER) nbextension enable $* --py --sys-prefix
-
-serverextensions: $(addprefix serverextension-enable-, $(SERVEREXTENSIONS))
-	$(JUPYTER) serverextension list
-
-serverextension-enable-%:
-	$(JUPYTER) serverextension enable $* --py --sys-prefix
 # ----------------------------------------------------------------------------
 # Apache Spark
 #
