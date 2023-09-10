@@ -42,7 +42,7 @@ ifeq ("$(shell uname -s)","Linux")
 export JAVA_HOME?=/usr/lib/jvm/adoptopenjdk-11-hotspot-amd64
 endif
 # ----------------------------------------------------------------------------
-SPARK_VERSION?=3.3.2
+SPARK_VERSION?=3.3.3
 HADOOP_VERSION?=3
 HIVE_VERSION=2.3.9
 SPARK_HOME?=$(DOT_VENV)/spark-$(SPARK_VERSION)-bin-hadoop$(HADOOP_VERSION)
