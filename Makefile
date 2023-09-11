@@ -52,7 +52,7 @@ HIVE_HOME?=$(DOT_VENV)/apache-hive-$(HIVE_VERSION)-bin
 # ----------------------------------------------------------------------------
 KERNELS+=ganymede
 
-GANYMEDE_RELEASE_VERSION?=2.1.1.20221231
+GANYMEDE_RELEASE_VERSION?=2.1.2.20230910
 GANYMEDE_RELEASE_URL?=https://github.com/allen-ball/ganymede/releases/download/v$(GANYMEDE_RELEASE_VERSION)/ganymede-$(GANYMEDE_RELEASE_VERSION).jar
 GANYMEDE_RELEASE_JAR?=$(DOT_VENV)/ganymede-$(GANYMEDE_RELEASE_VERSION).jar
 GANYMEDE_RELEASE_SPARK_VERSION?=$(SPARK_VERSION)
